@@ -1,0 +1,559 @@
+{% extends 'main/master.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+{% block style %}
+<style>
+    .form-card {
+        width: 100%;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    input[readonly] {
+        background-color: #f0f0f0;
+        color: #555;
+        cursor: not-allowed;
+    }
+
+    label {
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .btn-primary {
+        padding: 10px 20px;
+        border-radius: 5px;
+        background-color: #007bff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .radio-inline {
+        display: flex;
+        gap: 20px;
+    }
+
+    .radio-inline label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .form-step {
+        display: none;
+    }
+
+    .form-step.active {
+        display: block;
+    }
+
+    table[id$="-table"] {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    table[id$="-table"] th,
+    table[id$="-table"] td {
+        width: 250px; /* ganti sesuai kebutuhan, misal 200px */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    table[id$="-table"] input {
+        width: 100%;
+    }
+
+    .remove-row {
+        width: 100%;
+    }
+
+</style>
+{% endblock %}
+
+<div class="container-fluid py-2">
+    <div class="row">
+        <div class="col-12">
+            <div class="form-card">
+                <form method="post" id="multiStepForm">
+                    {% csrf_token %}
+
+                    <!-- Step 1: Header -->
+                    <div class="form-step active">
+                        <h3 class="mb-3">Header Information</h3>
+                        <p id="step-description">Insert the header data</p>
+                        <hr>
+
+                        {% for field in forms.header %}
+                        {% if 'option' in field.name %}
+                        <div class="form-group">
+                            <label>{{ field.label }}</label>
+                            <div class="radio-inline">
+                                {% for radio in field %}
+                                <label>{{ radio.tag }} {{ radio.choice_label }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% else %}
+                        {{ <field></field>py_field }}
+                        {% endif %}
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                            <button type="button" class="btn btn-primary next-step ms-2">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Form B3 -->
+                    <div class="form-step">
+                        <h3 class="mb-3">Form SPT 1111 B3</h3>
+                        <p id="step-description2">Isi data faktur pajak (bisa tambah lebih dari satu baris)</p>
+                        <hr>
+
+                        <div class="table-responsive" style="overflow-x: auto;">
+                            <table class="table table-bordered" id="b3-table">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>Nama Penjual BKP</th>
+                                    <th>NPWP</th>
+                                    <th>Nomor Faktur Pajak</th>
+                                    <th>Tanggal Faktur</th>
+                                    <th>DPP</th>
+                                    <th>PPN</th>
+                                    <th>PPnBM</th>
+                                    <th>Kode dan No.Seri Faktur Pajak Yang Diganti Diretur</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody id="b3-body">
+                                <tr>
+                                    <td><input type="text" name="spt1111_b3-bkp_saler_name[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b3-npwp_number[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b3-tax_invoice_serial_number[]"
+                                               class="form-control"></td>
+                                    <td><input type="date" name="spt1111_b3-tax_invoice_date[]" class="form-control">
+                                    </td>
+                                    <td><input type="text" name="spt1111_b3-dpp_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b3-ppn_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b3-ppnbm_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b3-changed_tax_invoice_serial_number[]"
+                                               class="form-control"></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Tombol di luar scroll -->
+                        <hr>
+                        <button type="button" class="btn btn-info mt-2" id="add-row-b3">Tambah Baris</button>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step ms-2">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Form B2 -->
+                    <div class="form-step">
+                        <h3 class="mb-3">Form SPT 1111 B2</h3>
+                        <p>Isi data faktur pajak (bisa tambah lebih dari satu baris)</p>
+                        <hr>
+
+                        <div class="table-responsive" style="overflow-x: auto;">
+                            <table class="table table-bordered" id="b2-table">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>Nama Penjual BKP</th>
+                                    <th>NPWP</th>
+                                    <th>Nomor Faktur Pajak</th>
+                                    <th>Tanggal Faktur</th>
+                                    <th>DPP</th>
+                                    <th>PPN</th>
+                                    <th>PPnBM</th>
+                                    <th>Kode dan No.Seri Faktur Pajak Yang Diganti Diretur</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody id="b2-body">
+                                <tr>
+                                    <td><input type="text" name="spt1111_b2-bkp_saler_name[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b2-npwp_number[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b2-tax_invoice_serial_number[]"
+                                               class="form-control"></td>
+                                    <td><input type="date" name="spt1111_b2-tax_invoice_date[]" class="form-control">
+                                    </td>
+                                    <td><input type="text" name="spt1111_b2-dpp_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b2-ppn_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b2-ppnbm_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b2-changed_tax_invoice_serial_number[]"
+                                               class="form-control"></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Tombol di luar scroll -->
+                        <hr>
+                        <button type="button" class="btn btn-info mt-2" id="add-row-b2">Tambah Baris</button>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step ms-2">Next</button>
+                        </div>
+                    </div>
+                    <div class="form-step">
+                        <h3 class="mb-3">Form SPT 1111 B1</h3>
+                        <p>Isi data faktur pajak (bisa tambah lebih dari satu baris)</p>
+                        <hr>
+
+                        <div class="table-responsive" style="overflow-x: auto;">
+                            <table class="table table-bordered" id="b1-table">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>Nama Penjual BKP</th>
+                                    <th>Nomor Dokumen</th>
+                                    <th>Tanggal Dokumen</th>
+                                    <th>DPP</th>
+                                    <th>PPN</th>
+                                    <th>PPnBM</th>
+                                    <th>Deskripsi</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody id="b1-body">
+                                <tr>
+                                    <td><input type="text" name="spt1111_b1-bkp_saler_name[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b1-document_number[]" class="form-control">
+                                    </td>
+                                    <td><input type="date" name="spt1111_b1-document_date[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b1-dpp_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b1-ppn_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b1-ppnbm_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_b1-description[]" class="form-control"></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Tombol di luar scroll -->
+                        <hr>
+                        <button type="button" class="btn btn-info mt-2" id="add-row-b1">Tambah Baris</button>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step ms-2">Next</button>
+                        </div>
+                    </div>
+                    <div class="form-step">
+                        <h3 class="mb-3">Form SPT 1111 A2</h3>
+                        <p>Isi data faktur pajak (bisa tambah lebih dari satu baris)</p>
+                        <hr>
+
+                        <div class="table-responsive" style="overflow-x: auto;">
+                            <table class="table table-bordered" id="a2-table">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>Nama Pembeli BKP</th>
+                                    <th>NPWP</th>
+                                    <th>Nomor Faktur Pajak</th>
+                                    <th>Tanggal Faktur</th>
+                                    <th>DPP</th>
+                                    <th>PPN</th>
+                                    <th>PPnBM</th>
+                                    <th>Kode dan No.Seri Faktur Pajak Yang Diganti Diretur</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody id="a2-body">
+                                <tr>
+                                    <td><input type="text" name="spt1111_a2-bkp_buyer_name[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_a2-npwp_number[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_a2-tax_invoice_serial_number[]"
+                                               class="form-control"></td>
+                                    <td><input type="date" name="spt1111_a2-tax_invoice_date[]" class="form-control">
+                                    </td>
+                                    <td><input type="text" name="spt1111_a2-dpp_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_a2-ppn_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_a2-ppnbm_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_a2-changed_tax_invoice_serial_number[]"
+                                               class="form-control"></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Tombol di luar scroll -->
+                        <hr>
+                        <button type="button" class="btn btn-info mt-2" id="add-row-a2">Tambah Baris</button>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step ms-2">Next</button>
+                        </div>
+                    </div>
+                    <div class="form-step">
+                        <h3 class="mb-3">Form SPT 1111 A1</h3>
+                        <p>Isi data faktur pajak (bisa tambah lebih dari satu baris)</p>
+                        <hr>
+
+                        <div class="table-responsive" style="overflow-x: auto;">
+                            <table class="table table-bordered" id="a1-table">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>Nama Pembeli BKP</th>
+                                    <th>Nomor Dokumen</th>
+                                    <th>Tanggal Dokumen</th>
+                                    <th>DPP</th>
+                                    <th>Deskripsi</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody id="a1-body">
+                                <tr>
+                                    <td><input type="text" name="spt1111_a1-bkp_saler_name[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_a1-document_number[]" class="form-control">
+                                    </td>
+                                    <td><input type="date" name="spt1111_a1-document_date[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_a1-dpp_value[]" class="form-control"></td>
+                                    <td><input type="text" name="spt1111_a1-description[]" class="form-control"></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Tombol di luar scroll -->
+                        <hr>
+                        <button type="button" class="btn btn-info mt-2" id="add-row-a1">Tambah Baris</button>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step ms-2">Next</button>
+                        </div>
+                    </div>
+                    <div class="form-step active">
+                        <h3 class="mb-3">Header Information</h3>
+                        <p id="step-description3">Insert the header data</p>
+                        <hr>
+
+                        {% for field in forms.spt1111_ab %}
+                        {% if 'option' in field.name %}
+                        <div class="form-group">
+                            <label>{{ field.label }}</label>
+                            <div class="radio-inline">
+                                {% for radio in field %}
+                                <label>{{ radio.tag }} {{ radio.choice_label }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% else %}
+                        {{ field|as_crispy_field }}
+                        {% endif %}
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step ms-2">Next</button>
+                        </div>
+                    </div>
+                    <div class="form-step active">
+                        <h3 class="mb-3">Header Information</h3>
+                        <p id="step-description4">Insert the header data</p>
+                        <hr>
+
+                        {% for field in forms.spt1111 %}
+                        {% if 'option' in field.name %}
+                        <div class="form-group">
+                            <label>{{ field.label }}</label>
+                            <div class="radio-inline">
+                                {% for radio in field %}
+                                <label>{{ radio.tag }} {{ radio.choice_label }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% else %}
+                        {{ field|as_crispy_field }}
+                        {% endif %}
+                        {% endfor %}
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary prev-step">Previous</button>
+                            <button type="submit" class="btn btn-primary ms-2">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS: Navigasi dan Tambah/Hapus Baris -->
+<script>
+    const steps = document.querySelectorAll(".form-step");
+    const nextBtns = document.querySelectorAll(".next-step");
+    const prevBtns = document.querySelectorAll(".prev-step");
+    const stepDescription = document.getElementById("step-description");
+    let currentStep = 0;
+
+    const stepDescriptions = [
+        "Step 1: Fill out basic taxpayer information.",
+        "Step 2: Enter detailed tax data (B3).",
+        "Step 3: Enter additional tax data (B2).",
+        "Step 4: Enter additional tax data  (B1).",
+        "Step 5: Enter additional tax data  (A2).",
+        "Step 6: Enter additional tax data  (A1).",
+        "Step 7: Enter additional tax data  (AB).",
+        "Step 8: Enter additional tax data  (SPT1111)."
+    ];
+
+    function validateCurrentStep(stepIndex) {
+        const inputs = steps[stepIndex].querySelectorAll("input, select, textarea");
+        for (let input of inputs) {
+            if (!input.checkValidity()) {
+                input.reportValidity();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function updateStepView() {
+        steps.forEach((step, index) => {
+            step.classList.toggle("active", index === currentStep);
+        });
+        if (stepDescription) {
+            stepDescription.textContent = stepDescriptions[currentStep] || "";
+        }
+    }
+
+    nextBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            if (!validateCurrentStep(currentStep)) return;
+            currentStep++;
+            updateStepView();
+        });
+    });
+
+    prevBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            currentStep--;
+            updateStepView();
+        });
+    });
+
+    function createRow(prefix) {
+        return `
+            <tr>
+                <td><input type="text" name="${prefix}-bkp_saler_name[]" class="form-control"></td>
+                <td><input type="text" name="${prefix}-npwp_number[]" class="form-control"></td>
+                <td><input type="text" name="${prefix}-tax_invoice_serial_number[]" class="form-control"></td>
+                <td><input type="date" name="${prefix}-tax_invoice_date[]" class="form-control"></td>
+                <td><input type="text" name="${prefix}-dpp_value[]" class="form-control"></td>
+                <td><input type="text" name="${prefix}-ppn_value[]" class="form-control"></td>
+                <td><input type="text" name="${prefix}-ppnbm_value[]" class="form-control"></td>
+                <td><input type="text" name="${prefix}-changed_tax_invoice_serial_number[]" class="form-control"></td>
+                <td><button type="button" class="btn btn-danger remove-row">Hapus</button></td>
+            </tr>
+        `;
+    }
+
+    function createRowb1(prefix) {
+        return `
+            <tr>
+                <td><input type="text" name="bkp_saler_name[]" class="form-control"></td>
+                <td><input type="text" name="document_number[]" class="form-control"></td>
+                <td><input type="date" name="document_date[]" class="form-control"></td>
+                <td><input type="text" name="dpp_value[]" class="form-control"></td>
+                <td><input type="text" name="ppn_value[]" class="form-control"></td>
+                <td><input type="text" name="ppnbm_value[]" class="form-control"></td>
+                <td><input type="text" name="description[]" class="form-control"></td>
+                <td><button type="button" class="btn btn-danger remove-row">Hapus</button></td>
+            </tr>
+        `;
+    }
+
+    function createRowa2(prefix) {
+        return `
+            <tr>
+                <td><input type="text" name="bkp_buyer_name[]" class="form-control"></td>
+                <td><input type="text" name="npwp_number[]" class="form-control"></td>
+                <td><input type="text" name="tax_invoice_serial_number[]" class="form-control"></td>
+                <td><input type="date" name="tax_invoice_date[]" class="form-control"></td>
+                <td><input type="text" name="dpp_value[]" class="form-control"></td>
+                <td><input type="text" name="ppn_value[]" class="form-control"></td>
+                <td><input type="text" name="ppnbm_value[]" class="form-control"></td>
+                <td><input type="text" name="changed_tax_invoice_serial_number[]" class="form-control"></td>
+                <td><button type="button" class="btn btn-danger remove-row">Hapus</button></td>
+            </tr>
+        `;
+    }
+
+    function createRowa1(prefix) {
+        return `
+            <tr>
+                <td><input type="text" name="bkp_buyer_name[]" class="form-control"></td>
+                <td><input type="text" name="document_number[]" class="form-control"></td>
+                <td><input type="date" name="document_date[]" class="form-control"></td>
+                <td><input type="text" name="dpp_value[]" class="form-control"></td>
+                <td><input type="text" name="description[]" class="form-control"></td>
+                <td><button type="button" class="btn btn-danger remove-row">Hapus</button></td>
+            </tr>
+        `;
+    }
+
+    document.getElementById('add-row-b3').addEventListener('click', function () {
+        document.getElementById('b3-body').insertAdjacentHTML('beforeend', createRow('spt1111_b3'));
+    });
+
+    document.getElementById('add-row-b2').addEventListener('click', function () {
+        document.getElementById('b2-body').insertAdjacentHTML('beforeend', createRow('spt1111_b2'));
+    });
+
+    document.getElementById('add-row-b1').addEventListener('click', function () {
+        document.getElementById('b1-body').insertAdjacentHTML('beforeend', createRowb1('spt1111_b1'));
+    });
+
+    document.getElementById('add-row-a2').addEventListener('click', function () {
+        document.getElementById('a2-body').insertAdjacentHTML('beforeend', createRowa2('spt1111_a2'));
+    });
+
+    document.getElementById('add-row-a1').addEventListener('click', function () {
+        document.getElementById('a1-body').insertAdjacentHTML('beforeend', createRowa1('spt1111_a1'));
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-row')) {
+            e.target.closest('tr').remove();
+        }
+    });
+
+    updateStepView();
+</script>
+{% endblock %}
+

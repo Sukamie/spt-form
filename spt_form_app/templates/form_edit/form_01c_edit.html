@@ -1,0 +1,249 @@
+{% extends 'main/master.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+
+{% block style %}
+<style>
+    .form-card {
+        width: 100%;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        border-color: #007bff; /* Set the border color to match the button color or your choice */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Optional: Add a shadow effect to show focus */
+    }
+
+    input[readonly] {
+        background-color: #f0f0f0;
+        color: #555;
+        cursor: not-allowed;
+    }
+
+    label {
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .btn-primary {
+        padding: 10px 20px;
+        border-radius: 5px;
+        background-color: #007bff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    <style>
+    .radio-inline {
+        display: flex;
+        gap: 20px;
+    }
+    .radio-inline label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+</style>
+
+{% endblock %}
+
+<div class="container-fluid py-2">
+    <div class="row">
+        <div class="col-12">
+            <div class="form-card">
+                <h3 class="mb-3">Update 01C SPT Form 1770</h3>
+                <p id="step-description">Insert the data in the field</p>
+                <hr>
+
+
+                <form method="post" id="multiStepForm">
+                    {% csrf_token %}
+
+                    <!-- Step 1 -->
+                    <div class="form-step active">
+                        {{ form.nwp|as_crispy_field }}
+                        {{ form.npwp|as_crispy_field }}
+                        {{ form.tax_year|as_crispy_field }}
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary prev-step" style="margin-right:10px" onclick="history.back()">Cancel
+                            </button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="form-step">
+                        {{ form.gross_income|as_crispy_field }}
+                        {{ form.deduction|as_crispy_field }}
+
+                        <div class="form-group">
+                            <label>{{ form.non_taxable_income_option.label }}</label>
+                            <div class="radio-inline">
+                                {% for radio in form.non_taxable_income_option %}
+                                <label>{{ radio.tag }} {{ radio.choice_label }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {{ form.non_taxable_income|as_crispy_field }}
+                        {{ form.taxable_income|as_crispy_field }}
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary prev-step" style="margin-right:10px">Previous</button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="form-step">
+                        {{ form.income_tax_payable|as_crispy_field }}
+                        {{ form.withheld_income_tax|as_crispy_field }}
+
+                        <div class="form-group">
+                            <label>{{ form.income_tax_option.label }}</label>
+                            <div class="radio-inline">
+                                {% for radio in form.income_tax_option %}
+                                <label>{{ radio.tag }} {{ radio.choice_label }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {{ form.income_tax_option_field|as_crispy_field }}
+                        {{ form.tax_base|as_crispy_field }}
+                        {{ form.final_income_tax_payable|as_crispy_field }}
+                        {{ form.income_exempt_from_tax|as_crispy_field }}
+                        {{ form.yearEnd_total|as_crispy_field }}
+                        {{ form.yearEnd_tax_liability|as_crispy_field }}
+                        {{ form.date|as_crispy_field }}
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary prev-step" style="margin-right:10px">Previous</button>
+                            <button type="submit" class="btn btn-success">Update File</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-step {
+      display: none;
+    }
+    .form-step.active {
+      display: block;
+    }
+</style>
+
+<script>
+  const steps = document.querySelectorAll(".form-step");
+  const nextBtns = document.querySelectorAll(".next-step");
+  const prevBtns = document.querySelectorAll(".prev-step");
+  const stepDescription = document.getElementById("step-description");
+  const submitBtn = document.getElementById("submitBtn");  // pastikan ID ini dipakai di tombol submit
+  let currentStep = 0;
+
+  // Deskripsi per step
+  const stepDescriptions = [
+    "Step 1: Fill in your NWP, NPWP, and tax year.",
+    "Step 2: Enter income, deductions, and taxable income.",
+    "Step 3: Finalize tax details and submit the form."
+  ];
+
+  // Validasi step saat ini
+  function validateCurrentStep(stepIndex) {
+    const inputs = steps[stepIndex].querySelectorAll("input, select, textarea");
+    for (let input of inputs) {
+      if (!input.checkValidity()) {
+        input.reportValidity();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Cek validitas step 3 untuk enable tombol submit
+  function validateStep3() {
+    const step3Inputs = steps[2].querySelectorAll("input, select, textarea");
+    let valid = true;
+    step3Inputs.forEach(input => {
+      if (!input.checkValidity()) valid = false;
+    });
+    if (submitBtn) submitBtn.disabled = !valid;
+  }
+
+  // Update tampilan step + deskripsi
+  function updateStepView() {
+    steps.forEach((step, index) => {
+      step.classList.toggle("active", index === currentStep);
+    });
+    if (stepDescription) {
+      stepDescription.textContent = stepDescriptions[currentStep];
+    }
+
+    // Jika di step 3, langsung validasi untuk submit button
+    if (currentStep === 2) {
+      validateStep3();
+    }
+  }
+
+  nextBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (!validateCurrentStep(currentStep)) return;
+      currentStep++;
+      updateStepView();
+    });
+  });
+
+  prevBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentStep--;
+      updateStepView();
+    });
+  });
+
+  // Validasi live input di step 3 untuk enable submit
+  if (steps[2]) {
+    const step3Inputs = steps[2].querySelectorAll("input, select, textarea");
+    step3Inputs.forEach(input => {
+      input.addEventListener("input", validateStep3);
+      input.addEventListener("change", validateStep3);
+    });
+  }
+
+  // Disable tombol submit saat dikirim
+  document.querySelector("form").addEventListener("submit", function () {
+    if (submitBtn) submitBtn.disabled = true;
+  });
+
+  // Inisialisasi tampilan pertama
+  updateStepView();
+</script>
+
+{% endblock %}
+
+

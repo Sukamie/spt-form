@@ -1,0 +1,1686 @@
+{% extends 'main/master.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+{% block style %}
+<style>
+    .form-wizard-step {
+        display: none;
+        animation: fadeSlide 0.3s ease-in-out;
+    }
+
+    .form-wizard-step.active {
+        display: block;
+    }
+
+    @keyframes fadeSlide {
+        0% {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .form-card {
+        width: 100%;
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    input[readonly] {
+        background-color: #f0f0f0;
+        color: #555;
+        cursor: not-allowed;
+    }
+
+    label {
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .btn-primary {
+        padding: 10px 20px;
+        border-radius: 5px;
+        background-color: #007bff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .radio-inline {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .radio-inline label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+</style>
+{% endblock %}
+
+<div class="container-fluid py-2">
+    <div class="row">
+        <div class="col-12">
+            <form method="post" id="multiStepForm">
+                {% csrf_token %}
+
+                <!-- STEP 1 -->
+                <div class="form-wizard-step active">
+                    <div class="form-card">
+                        <h3 class="mb-3">Buat Baru Form SPT 01A</h3>
+                        <p>Masukkan Data Utama SPT 01A</p>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.spt_option|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.tax_status|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        {{ form.npwp|as_crispy_field }}
+                        {{ form.nwp|as_crispy_field }}
+                        {{ form.address|as_crispy_field }}
+                        {{ form.spouse_npwp|as_crispy_field }}
+                    </div>
+
+                    <div class="form-card">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.business_type|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.klu_code|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.phone|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.facsimile|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        {{ form.tax_year|as_crispy_field }}
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.start_date|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.end_date|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2" onclick="history.back()">Cancel
+                            </button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div class="form-wizard-step">
+                    <div class="form-card">
+                        <h3 class="mb-3">SPT Form 01A (1770-IV)</h3>
+                        <h5>Bagian A : Harta Pada Akhir Tahun</h5>
+                        <p>Masukkan Data Harta pada Tabel di Bawah Ini</p>
+
+                        <hr>
+                        <div class="table-responsive">
+                            <table class="table table-bordered dynamic-table" id="asset-table-1">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>Kode Harta</th>
+                                    <th>Nama Harta</th>
+                                    <th>Harga Perolehan</th>
+                                    <th>Keterangan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" name="asset_code[]" class="form-control"></td>
+                                    <td><input type="text" name="asset_name[]" class="form-control"></td>
+                                    <td><input type="text" name="acq_cost[]" class="form-control"></td>
+                                    <td><input type="text" name="description[]" class="form-control"></td>
+                                    <td class="text-center">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                        {{ form.total_asset|as_crispy_field }}
+                        <button type="button" class="btn btn-info mt-2 add-asset-row">Tambah Baris</button>
+                    </div>
+
+                    <!-- FORM 2 -->
+                    <div class="form-card">
+                        <h5>Bagian B : Kewajiban/Utang Pada Akhir Tahun</h5>
+                        <p>Masukkan Data Kewajiban/Utang pada Tabel di Bawah Ini</p>
+                        <hr>
+                        <div class="table-responsive">
+                            <table class="table table-bordered dynamic-table" id="asset-table-2">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>Kode Utang</th>
+                                    <th>Nama Pemberi Pinjaman</th>
+                                    <th>Alamat Pemberi</th>
+                                    <th>Tahun Peminjaman</th>
+                                    <th>Jumlah</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" name="debt_code[]" class="form-control"></td>
+                                    <td><input type="text" name="lender_name[]" class="form-control"></td>
+                                    <td><input type="text" name="lender_address[]" class="form-control"></td>
+                                    <td><input type="number" name="loan_year[]" class="form-control"></td>
+                                    <td><input type="text" name="amount[]" class="form-control"></td>
+                                    <td class="text-center">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                        {{ form.total_debt|as_crispy_field }}
+                        <button type="button" class="btn btn-info mt-2 add-asset-row">Tambah Baris</button>
+                    </div>
+
+                    <!-- FORM 3 -->
+                    <div class="form-card">
+                        <h5>Bagian C : Daftar Susunan Anggota Keluarga</h5>
+                        <p>Masukkan Data Anggota Keluarga pada Tabel di Bawah Ini</p>
+                        <hr>
+                        <div class="table-responsive">
+                            <table class="table table-bordered dynamic-table" id="asset-table-3">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>NIK</th>
+                                    <th>Hubungan</th>
+                                    <th>Pekerjaan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" name="family_member_name[]" class="form-control">
+                                    </td>
+                                    <td><input type="text" name="id_number[]" class="form-control"></td>
+                                    <td><input type="text" name="family_relationship[]" class="form-control">
+                                    </td>
+                                    <td><input type="text" name="occupation[]" class="form-control"></td>
+                                    <td class="text-center">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-info mt-2 add-asset-row">Tambah Baris</button>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2 prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3 -->
+                <div class="form-wizard-step">
+                    <div class="form-card">
+                        <h3 class="mb-3">SPT Form 01A (Daftar Pembayaran OPPT)</h3>
+                        <p>Masukkan Data Pembayaran OPPT pada Tabel di Bawah Ini</p>
+                        <hr>
+                        <div class="table-responsive">
+                            <table class="table table-bordered dynamic-table" id="asset-table-4">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>NPWP Tempat Usaha</th>
+                                    <th>Alamat</th>
+                                    <th>Peredaran Bruto Pedagang Pengecer</th>
+                                    <th>PPh Pasal 25 Dibayar</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" name="oppt_business_place_npwp[]" class="form-control"></td>
+                                    <td><input type="text" name="oppt_address[]" class="form-control"></td>
+                                    <td><input type="text" name="retail_gross_income[]" class="form-control">
+                                    </td>
+                                    <td><input type="text" name="income_tax_25_paid[]" class="form-control"></td>
+                                    <td class="text-center">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.total_retail_gross_income|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.total_income_tax_25_paid|as_crispy_field }}
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-info mt-2 add-asset-row">Tambah Baris</button>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2 prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 4 -->
+                <div class="form-wizard-step active">
+                    <div class="form-card">
+                        <h3 class="mb-3">SPT Form 01A (1770-III)</h3>
+                        <h5>Bagian A : Penghasilan yang Dikenakan Pajak Final dan/atau Bersifat Final</h5>
+                        <hr>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <hr>
+                                <p><b>1. Bunga Deposito, Tabungan, Diskonto SBI, Surat Berharga Negara</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.saving_tax_base|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.saving_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <p><b>2. Bunga/Diskonto Obligasi</b></p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form1770III.obligation_option|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.interest_tax_base|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.interest_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>3. Penjualan Saham di Bursa Efek</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.share_sale_tax_base|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.share_sale_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>4. Hadiah Undian</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.prize_tax_base|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.prize_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>5. Pesangon, Tunjangan Hari Tua dan Tebusan Pensiun yang Dibayar Sekaligus</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-8">
+                                        {{ form1770III.severance_pay_tax_base|as_crispy_field }}
+                                    </div>
+                                    <div class="col-4">
+                                        {{ form1770III.percentage_for_severance_pay_income_tax_payable|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.severance_pay_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>6. Honorarium atas Beban APBN/APBD</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-8">
+                                        {{ form1770III.honorarium_tax_base|as_crispy_field }}
+                                    </div>
+                                    <div class="col-4">
+                                        {{ form1770III.percentage_for_honorarium_income_tax_payable|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.honorarium_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>7. Pengalihan Hak atas Tanah dan/atau Bangunan</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.transfer_of_land_right_tax_base|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.transfer_of_land_right_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>8. Bangunan yang Diterima dalam Rangka Bangunan Guna Serah</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-8">
+                                        {{ form1770III.received_buildings_tax_base|as_crispy_field }}
+                                    </div>
+                                    <div class="col-4">
+                                        {{ form1770III.percentage_for_received_buildings_income_tax_payable|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.received_buildings_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>9. Sewa atas Tanah dan/atau Bangunan</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.land_lease_tax_base|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.land_lease_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>10. Usaha Jasa Konstruksi</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-8">
+                                        {{ form1770III.construction_service_tax_base|as_crispy_field }}
+                                    </div>
+                                    <div class="col-4">
+                                        {{ form1770III.percentage_for_construction_service_income_tax_payable|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.construction_service_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <p><b>11. Penyalur/Dealer/Agen Produk BBM</b></p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form1770III.distributor_option|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.distributor_tax_base|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.distributor_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>12. Bunga Simpanan yang Dibayarkan oleh Koperasi kepada Anggota Koperasi</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.interest_on_deposits_pay_tax_base|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.interest_on_deposits_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>13. Penghasilan dari Transaksi Derivatif</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-8">
+                                        {{ form1770III.derivative_income_tax_base|as_crispy_field }}
+                                    </div>
+                                    <div class="col-4">
+                                        {{ form1770III.percentage_for_derivative_income_tax_payable|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.derivative_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <p><b>14. Dividen</b></p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form1770III.dividend_option|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.dividend_tax_base|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.dividend_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>15. Penghasilan Isteri dari Satu Pemberi Kerja</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-8">
+                                        {{ form1770III.wife_income_tax_base|as_crispy_field }}
+                                    </div>
+                                    <div class="col-4">
+                                        {{ form1770III.percentage_for_wife_income_tax_payable|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.wife_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <p><b>16. Penghasilan Lain yang Dikenakan Pajak Final <br>
+                            dan/atau Bersifat Final</b></p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form1770III.other_income_option|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.other_income_tax_base|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form1770III.other_income_tax_payable|as_crispy_field }}
+                            </div>
+                            <hr>
+                            <p><b>17. Jumlah (1 s.d. 16)</b></p>
+                            {{ form1770III.total_final_income|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <h5>Penghasilan Lain yang Dikenakan Pajak Final dan/atau Bersifat Final</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>A.Penghasilan dari Luar Negeri yang Diperoleh WNA dengan
+                                    Keahlian Tertentu (Sebagaimana Dimaksud Dalam Pasal 4 Ayat (1a) UU PPh)</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770III.foreign_income_expert_wna|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>B.Penggantian atau Imbalan Sehubungan dengan Pekerjaan
+                                    atau Jasa yang Diberikan dalam Bentuk Natura
+                                    dan/atau Kenikmatan yang Dikecualikan dari Objek PPh </b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770III.non_taxable_benefit|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>C. Penghasilan Lainnya yang Dikecualikan dari Objek Pajak Penghasilan</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770III.natura_exempt_income|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <h5>Bagian B : Penghasilan yang Tidak Termasuk Objek Pajak</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>1. Bantuan/Sumbangan/Hibah</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770III.assistance_gross_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2. Warisan</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770III.inheritance_gross_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>3. Bagian Laba Anggota Perseroan Komanditer Tidak atas Saham,
+                                    Persekutuan, Perkumpulan, Firma, Kongsi</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770III.partnership_gross_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>4. Klaim Asuransi Kesehatan, Kecelakaan, Jiwa Dwiguna, Beasiswa</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770III.insurance_gross_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>5. Beasiswa</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770III.scholarship_gross_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>6. Penghasilan Lain yang Dikenakan Pajak Final dan/atau Bersifat Final</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770III.other_gross_income|as_crispy_field }}
+                            </div>
+                        </div>
+                        <hr>
+                        <p><b>Jumlah Bagian B</b></p>
+                        {{ form1770III.total_side_b|as_crispy_field }}
+                    </div>
+
+                    <div class="form-card">
+                        <h5>Bagian C : Penghasilan Istri/Suami yang Dikenakan Pajak Secara Terpisah</h5>
+                        <hr>
+                        {{ form1770III.spouse_net_income|as_crispy_field }}
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2 prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 5 -->
+                <div class="form-wizard-step">
+                    <div class="form-card">
+                        <h3 class="mb-3">SPT Form 01A (Daftar Pembayaran PP 46-2013)</h3>
+                        <p>Masukkan Data Pembayaran PP 46-2013 pada Tabel di Bawah Ini</p>
+                        <hr>
+                        <div class="table-responsive">
+                            <table class="table table-bordered dynamic-table" id="asset-table-5">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>NPWP</th>
+                                    <th>Masa Pajak</th>
+                                    <th>Alamat</th>
+                                    <th>Peredaran Bruto</th>
+                                    <th>Jumlah PPh Final yang Dibayar</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" name="pp46_npwp[]" class="form-control"></td>
+                                    <td><input type="text" name="tax_period" class="form-control"></td>
+                                    <td><input type="text" name="pp46_address[]" class="form-control">
+                                    </td>
+                                    <td><input type="text" name="gross_turnover[]" class="form-control gross_turnover">
+                                    </td>
+                                    <td><input type="text" name="final_pph_paid[]" class="form-control final_pph_paid"
+                                               readonly></td>
+                                    <td class="text-center">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.total_gross_turnover|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.total_pph_final_paid|as_crispy_field }}
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-info mt-2 add-asset-row">Tambah Baris</button>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2 prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- STEP 6 -->
+                <div class="form-wizard-step">
+                    <div class="form-card">
+                        <h3 class="mb-3">SPT Form 01A (1770-II)</h3>
+                        <h5>Bagian A : Daftar Pemotongan/Pemungutan PPh Oleh Pihak Lain, PPh yang Dibayar/Dipotong<br>
+                            di Luar Negeri dan PPh Ditanggung Pemerintah</h5>
+                        <hr>
+                        <div class="table-responsive">
+                            <table class="table table-bordered dynamic-table" id="asset-table-6">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>Nama Pemotong/Pemungut Pajak</th>
+                                    <th>NPWP Pemotong/Pemungut Pajak</th>
+                                    <th>Nomor Bukti Pemotongan/Pemungutan</th>
+                                    <th>Tanggal Bukti Pemotongan/Pemungutan</th>
+                                    <th>Jenis Pajak : (PPh Pasal 21/22/23/24/25/26/DTP*)</th>
+                                    <th>Jumlah PPh yang Dipotong/Dipungut (Rupiah)</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" name="withholder_name[]" class="form-control"></td>
+                                    <td><input type="text" name="withholder_npwp[]" class="form-control"></td>
+                                    <td><input type="text" name="receipt_number[]" class="form-control"></td>
+                                    <td><input type="date" name="receipt_date[]" class="form-control"></td>
+                                    <td><select name="tax_type[]" class="form-control">
+                                        <option value="">-- Pilih Jenis Pajak --</option>
+                                        <option value="21">PPh Pasal 21</option>
+                                        <option value="22">PPh Pasal 22</option>
+                                        <option value="23">PPh Pasal 23</option>
+                                        <option value="24">PPh Pasal 24</option>
+                                        <option value="25">PPh Pasal 25</option>
+                                        <option value="26">PPh Pasal 26</option>
+                                        <option value="DTP">PPh DTP</option>
+                                    </select></td>
+                                    <td><input type="text" name="pph_amount[]" class="form-control"></td>
+                                    <td class="text-center">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                        {{ form.total_pph_amount|as_crispy_field }}
+                        <button type="button" class="btn btn-info mt-2 add-asset-row">Tambah Baris</button>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2 prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 7 -->
+                <div class="form-wizard-step active">
+                    <div class="form-card">
+                        <h3 class="mb-3">SPT Form 01A (1770-I-Hal 2)</h3>
+                        <h5>Bagian B : Penghasilan Neto Dalam Negeri Dari Usaha dan/atau Pekerjaan Bebas <br>
+                            (Bagi Wajib Pajak yang Menyelenggarakan Pencatatan)</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <hr>
+                                <p><b>1. Dagang</b></p>
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.trading_business_turnover|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.trading_norms|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.net_trading_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p><b>2. Industri</b></p>
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.industry_business_turnover|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.industry_norms|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.net_industry_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p><b>3. Jasa</b></p>
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.service_business_income|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.service_norms|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.net_service_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p><b>4. Pekerjaan Bebas</b></p>
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.hard_labor_business_turnover|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.hard_labor_norms|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.net_hard_labor_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p><b>5. Usaha Lainnya</b></p>
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.other_business_turnover|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.other_business_norms|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form1770Ihal2.net_other_business_income|as_crispy_field }}
+                            </div>
+                        </div>
+                        <hr>
+                        {{ form1770Ihal2.total_net_income_b|as_crispy_field }}
+                        <hr>
+                    </div>
+
+                    <div class="form-card">
+                        <h5>Bagian C : Penghasilan Neto Dalam Negeri Sehubungan dengan Pekerjaan <br>
+                            (Tidak Termasuk Penghasilan yang Dikenakan PPh Bersifat Final)</h5>
+                        <hr>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered dynamic-table" id="asset-table-7">
+                                <thead class="text-center">
+                                <tr>
+                                    <th>NPWP Pemberi Kerja</th>
+                                    <th>Penghasilan Bruto (Rupiah)</th>
+                                    <th>Pengurangan Penghasilan Bruto/Biaya (Rupiah)</th>
+                                    <th>Penghasilan Neto (Rupiah)</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" name="employee_npwp[]" class="form-control"></td>
+                                    <td><input type="text" name="gross_income[]" class="form-control"></td>
+                                    <td><input type="text" name="income_deduction[]" class="form-control"></td>
+                                    <td><input type="text" name="net_income[]" class="form-control"></td>
+                                    <td class="text-center">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+                        {{ form1770Ihal2.total_net_income_c|as_crispy_field }}
+                        <button type="button" class="btn btn-info mt-2 add-asset-row">Tambah Baris</button>
+                        <hr>
+                    </div>
+
+                    <div class="form-card">
+                        <div class="row">
+                            <h5>Bagian D : Penghasilan Neto Dalam Negeri Lainnya<br>
+                                (Tidak Termasuk Penghasilan yang Dikenakan PPh Bersifat Final)</h5>
+
+                            <hr>
+                            <div class="col-md-6">
+                                <hr>
+                                <p><b>1. Bunga </b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal2.total_net_interest|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2. Royalti </b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal2.total_net_royalties|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>3. Sewa</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal2.total_net_rental_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>4. Penghargaan dan Hadiah</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal2.total_net_prize|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>5. Keuntungan dari Penjualan/Pengalihan Harta</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal2.total_net_capital_gains|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>6. Penghasilan Lainnya</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal2.total_net_other_income|as_crispy_field }}
+                            </div>
+                        </div>
+                        <hr>
+                        {{ form1770Ihal2.total_net_income_d|as_crispy_field }}
+                        <hr>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2 prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 8 -->
+                <div class="form-wizard-step active">
+                    <div class="form-card">
+                        <h3 class="mb-3">SPT Form 01A (1770-I-Hal 1)</h3>
+                        <h5>Bagian A: Penghasilan Neto Dalam Negeri dari Usaha dan/Atau Pekerjaan Bebas<br>
+                            (Bagi Wajib Pajak yang Menyelenggarakan Pembukuan)</h5>
+                        <hr>
+
+                        {{ form1770Ihal1.book_keeping_option|as_crispy_field }}
+
+                    </div>
+
+                    <div class="form-card">
+                        {{ form1770Ihal1.public_accountant|as_crispy_field }}
+                        {{ form1770Ihal1.public_accountant_npwp|as_crispy_field }}
+                        {{ form1770Ihal1.public_accountant_office|as_crispy_field }}
+                        {{ form1770Ihal1.public_accountant_office_npwp|as_crispy_field }}
+                    </div>
+
+                    <div class="form-card">
+                        {{ form1770Ihal1.tax_consultant|as_crispy_field }}
+                        {{ form1770Ihal1.tax_consultant_npwp|as_crispy_field }}
+                        {{ form1770Ihal1.tax_consultant_office|as_crispy_field }}
+                        {{ form1770Ihal1.tax_consultant_office_npwp|as_crispy_field }}
+                    </div>
+
+                    <div class="form-card">
+                        <h5>1. Penghasilan dari Usaha dan/atau Pekerjaan Bebas Berdasarkan <br>
+                            Laporan Keuangan Komersial :</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>1.A. Peredaran Usaha</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.business_turnover|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>1.B. Harga Pokok Penjualan</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.cost_of_goods_sold|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>1.C. Laba/Rugi Bruto Usaha (1a-1b)</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.total_gross_revenue|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>1.D. Biaya Usaha</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.business_expenses|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>1.E. Penghasilan Neto (1c-1d)</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.net_income|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <h5>2.
+                            Penyesuaian Fiskal Positif :
+                        </h5>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.A. Biaya yang Dibebankan/Dikeluarkan untuk Kepentingan Pribadi Wajib Pajak
+                                    atau Orang yang Menjadi Tanggungannya</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.personal_expenses|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.B. Premi Asuransi Kesehatan, Asuransi Kecelakaan, Asuransi Jiwa, Asuransi
+                                    Dwiguna
+                                    , dan Asuransi Beasiswa yang Dibayar oleh Wajib Pajak</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.insurance_premium|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.C. Penggantian atau Imbalan Sehubungan dengan Pekerjaan atau Jasa yang diberikan
+                                    dalam Bentuk Natura atau Kenikmatan</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.compensation|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.D. Jumlah yang Melebihi Kewajaran yang Dibayarkan kepada Pihak yang Mempunyai
+                                    Hubungan Istimewa Sehubungan dengan Pekerjaan yang Dilakukan</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.excess_rp_payment|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.E. Harta yang Dihibahkan, Bantuan atau Sumbangan</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.gifted_assets|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.F. Pajak Penghasilan</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.income_tax|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.G. Gaji yang Dibayarkan kepada Pemilik/ Orang yang Menjadi Tanggungannya</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.owner_salary|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.H. Sanksi Administrasi</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.administrative_sanction|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.I. Selisih Penyusutan/Amortisasi Komersial di atas
+                                    Penyusutan/Amortisasi Fiskal</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.positive_depreciation_difference|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.J. Biaya untuk Mendapatkan, Menagih dan Memelihara Penghasilan yang
+                                    Dikenakan PPh Final dan Penghasilan yang Tidak Termasuk Objek Pajak</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.income_maintenance_expenses|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.K. Penyesuaian Fiskal Positif Lainnya</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.positive_fiscal_adjustment|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2.L. Jumlah (2a s.d. 2k)</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.total_positive_fiscal_adjustment|as_crispy_field }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-card">
+                        <h5>3. Penyesuaian Fiskal Negatif :</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>3.A. Penghasilan yang Dikenakan PPh Final dan Penghasilan yang Tidak
+                                    Termasuk Objek Pajak Tetapi Termasuk dalam Peredaran Usaha</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.business_turnover_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>3.B. Selisih Penyusutan/Amortisasi Komersial di bawah Penyusutan Amotisasi
+                                    Fiskal</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.negative_depreciation_difference|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>3.C. Penyesuaian Fiskal Negatif Lainnya</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.negative_fiscal_adjustment|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>3.D. Jumlah (3a s.d 3c)</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.total_negative_fiscal_adjustment|as_crispy_field }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-card">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>4. Jumlah Bagian A (1E + 2L - 3D)</h5>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form1770Ihal1.total_side_a|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2 prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 9 -->
+                <div class="form-wizard-step active">
+                    <div class="form-card">
+                        <h3 class="mb-3">SPT Form 01A (1770)</h3>
+                        <h5>A. Penghasilan Neto</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>1. Penghasilan Neto dalam Negeri dari Usaha dan/atau Pekerjaan Bebas</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ 1770.net_domestic_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2. Penghasilan Neto dalam Negeri Sehubungan dengan Pekerjaan</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ 1770.employment_net_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>3. Penghasilan Neto dalam Negeri Lainnya</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ 1770.other_net_domestic_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>4. Penghasilan Neto Luar Negeri</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ 1770.foreign_net_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>5. Jumlah Penghasilan Neto (1+2+3+4)</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ 1770.total_net_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>6. Zakat/Sumbangan Keagamaan yang Bersifat Wajib</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ 1770.zakat|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>7. Jumlah Penghasilan Neto Setelah Pengurangan Zakat/ Sumbangan
+                                    Keagamaan yang Sifatnya Wajib (5-6)</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ 1770.net_income_after_zakat|as_crispy_field }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-card">
+                        <h5>B. Penghasilan Kena Pajak</h5>
+                        <hr>
+                        {{ 1770.loss_compensation|as_crispy_field }}
+                        {{ 1770.net_income_after_compensation|as_crispy_field }}
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ 1770.ptkp_option|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ 1770.ptkp_amount|as_crispy_field }}
+                            </div>
+
+                            <div class="col-md-4">
+                                {{ 1770.non_taxable_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        {{ 1770.taxable_income|as_crispy_field }}
+                    </div>
+
+                    <div class="form-card">
+                        <h5>C. PPh Terutang</h5>
+                        <hr>
+                        {{ 1770.tax_payable|as_crispy_field }}
+                        {{ 1770.tax_reduction|as_crispy_field }}
+                        {{ 1770.total_tax_payable|as_crispy_field }}
+                    </div>
+
+                    <div class="form-card">
+                        <h5>C. Kredit Pajak</h5>
+                        <hr>
+
+                        {{ 1770.withheld_income_tax|as_crispy_field }}
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ 1770.pph_option|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ 1770.pph_option_field|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        {{ 1770.self_assessed_income_tax_1|as_crispy_field }}
+                        {{ 1770.self_assessed_income_tax_2|as_crispy_field }}
+                        {{ 1770.total_tax_credit|as_crispy_field }}
+
+                    </div>
+
+                    <div class="form-card">
+                        <h5>E. PPh Kurang/Lebih Bayar</h5>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ 1770.paid_option_income_tax|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ 1770.settlement_date|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ 1770.paid_option_income_tax_field|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        {{ 1770.application_option|as_crispy_field }}
+
+                    </div>
+
+                    <div class="form-card">
+                        <h5>F. Angsuran PPh Pasal 25 Tahun Pajak Berikutnya</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ 1770.income_tax_installment|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ 1770.income_tax_installment_option|as_crispy_field }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-card">
+                        <h5>G. Lampiran</h5>
+                        <hr>
+
+                        <div style="display: flex; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 300px;">
+                                {% for checkbox in 1770.attachment_option %}
+                                {% if forloop.counter0|divisibleby:2 %}
+                                <div class="form-check">
+                                    {{ checkbox.tag }} {{ checkbox.choice_label }}
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div style="flex: 1; min-width: 300px;">
+                                {% for checkbox in 1770.attachment_option %}
+                                {% if not forloop.counter0|divisibleby:2 %}
+                                <div class="form-check">
+                                    {{ checkbox.tag }} {{ checkbox.choice_label }}
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="form-card">
+                        <h5>H. Lainnya</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ 1770.tax_option|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ 1770.form_date|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2 prev-step">Previous</button>
+                            <button type="button" class="btn btn-primary next-step">Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 10 -->
+                <div class="form-wizard-step active">
+                    <div class="form-card">
+                        <h3 class="mb-3">SPT Form 01A (Perhitungan PH-MT)</h3>
+                        <h5>A. Penghasilan Neto</h5>
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <hr>
+                                <p><b>1. Penghasilan Neto dalam Negeri dari Usaha dan/atau Pekerjaan Bebas</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.husband_net_domestic_income|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.wife_net_domestic_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>2. Penghasilan Neto dalam Negeri Sehubungan dengan Pekerjaan</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.husband_net_domestic_employment_income|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.wife_net_domestic_employment_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>3. Penghasilan Neto dalam Negeri Lainnya</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.husband_net_foreign_income|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.wife_net_foreign_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>4. Penghasilan Neto Luar Negeri</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.husband_net_income_after_zakat|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.wife_net_income_after_zakat|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>5. Zakat/Sumbangan Keagamaan yang Bersifat Wajib</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.husband_zakat|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.wife_zakat|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>6. Jumlah Neto (1+2+3+4)</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.husband_total|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.wife_total|as_crispy_field }}
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>7. Kompensasi Kerugian</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.husband_loss_compensation|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.wife_loss_compensation|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><b>8. Jumlah Penghasilan Neto (6-7)</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.husband_total_net_income|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form01aPhMtCalculate.wife_total_net_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-card">
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <hr>
+                                <h5>B. Jumlah Penghasilan Neto Suami dan Istri [A.8.(3)+A.8.(4)]</h5>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form01aPhMtCalculate.spouse_total_net_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>C. Penghasilan Tidak Kena Pajak</h5>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form01aPhMtCalculate.non_taxable_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>D. Penghasilan Kena Pajak [B-C]</h5>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form01aPhMtCalculate.taxable_income|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <hr>
+                        <h5>E. Pajak Penghasilan Terutang (Gabungan)</h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>1. 5% x .................</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form01aPhMtCalculate.five_percen_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>2. 15% x .................</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form01aPhMtCalculate.fifteen_percen_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>3. 25% x .................</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form01aPhMtCalculate.twenty_five_percen_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>4. 30% x .................</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form01aPhMtCalculate.thirty_percen_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><b>Jumlah Pajak Penghasilan Terutang (Gabungan)</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form01aPhMtCalculate.total_of_income_tax_payable|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>F. PPh Terutang yang Ditanggung Suami [A.8.(3 / B) x E]</h5>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form01aPhMtCalculate.income_tax_payable_borne_by_husband|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>G. PPh Terutang yang Ditanggung Istri [A.8.(3 / B) x E]</h5>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form01aPhMtCalculate.income_tax_payable_borne_by_wife|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <h5>Biodata Suami</h5>
+                        <hr>
+                        {{ form01aPhMtCalculate.husband_name|as_crispy_field }}
+                        {{ form01aPhMtCalculate.husband_npwp|as_crispy_field }}
+                    </div>
+
+                    <div class="form-card">
+                        <h5>Biodata Istri</h5>
+                        <hr>
+                        {{ form01aPhMtCalculate.wife_name|as_crispy_field }}
+                        {{ form01aPhMtCalculate.wife_npwp|as_crispy_field }}
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary me-2 prev-step">Previous</button>
+                            <button type="submit" class="btn btn-primary" name="submit">Simpan</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'js/book_keeping.js' %}"></script>
+<script src="{% static 'js/bookkeeping_spt_option.js' %}"></script>
+<script src="{% static 'js/dynamic_table.js' %}"></script>
+<script src="{% static 'js/calculation.js' %}"></script>
+<script src="{% static 'js/multi_step_form.js' %}"></script>
+<script src="{% static 'js/pp46_field.js' %}"></script>
+<script src="{% static 'js/sum.js' %}"></script>
+
+
+{% endblock %}
+
+<!--<button type="button" class="btn btn-secondary me-2" onclick="history.back()">Cancel</button>-->

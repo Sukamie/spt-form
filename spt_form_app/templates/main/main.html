@@ -1,0 +1,139 @@
+{%  extends 'main/master.html' %}
+{% load i18n %}
+{%  load static %}
+
+{% block content %}
+
+<div class="container-fluid py-2">
+    <div class="row">
+        <div class="ms-3">
+            <h3 class="mb-0 h4 font-weight-bolder">Welcome to SPT Form App</h3>
+            <p class="mb-4">
+                Create, edit, and download ur SPT Form in here!
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-0 ">01A SPT Form 1770</h6>
+                    <p class="text-sm ">01A SPT OP FORM 1770 Per 19 PJ 2014</p>
+                    <div class="pe-2">
+                        <div class="chart">
+                            <div class="chart p-0 m-0">
+                                <img src="{% static 'assets/option-image/spt1.png' %}" alt="Chart Image"
+                                     class="w-100" style="height: 180px; object-fit: cover; border: 1px solid black;">
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="dark horizontal">
+                    <div class="d-flex justify-content-center">
+                        <a href="{% url 'form-01a' %}"
+                           class="btn btn-success rounded-pill px-4 py-2 d-flex align-items-center gap-2">
+                            <span class="fw-bold">+</span> Create New File
+                        </a>
+                        <a href="{% url 'form_01a_manage' %}" class="btn btn-primary rounded-pill px-4 py-2 ms-2">
+                            View All File
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+            <div class="card ">
+                <div class="card-body">
+                    <h6 class="mb-0 ">01B SPT Form 1770</h6>
+                    <p class="text-sm ">01B SPT OP FORMULIR SPT 1770 S</p>
+                    <div class="pe-2">
+                        <div class="chart p-0 m-0">
+                            <img src="{% static 'assets/option-image/spt2.png' %}" alt="Chart Image"
+                                 class="w-100" style="height: 180px; object-fit: cover; border: 1px solid black;">
+                        </div>
+                    </div>
+                    <hr class="dark horizontal">
+                    <div class="d-flex justify-content-center">
+                        <a href="{% url 'form-01b' %}"
+                           class="btn btn-success rounded-pill px-4 py-2 d-flex align-items-center gap-2">
+                            <span class="fw-bold">+</span> Create New File
+                        </a>
+                        <a href="{% url 'form_01b_manage' %}" class="btn btn-primary rounded-pill px-4 py-2 ms-2">
+                            View All File
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mt-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-0 ">01C SPT Form 1770</h6>
+                    <p class="text-sm ">01C SPT OP FORMULIR SPT 1770 SS</p>
+                    <div class="pe-2">
+                        <div class="chart p-0 m-0">
+                            <img src="{% static 'assets/option-image/spt3.png' %}" alt="Chart Image"
+                                 class="w-100" style="height: 180px; object-fit: cover; border: 1px solid black;">
+                        </div>
+                    </div>
+                    <hr class="dark horizontal">
+                    <div class="d-flex justify-content-center">
+                        <a href="{% url 'form-01c' %}"
+                           class="btn btn-success rounded-pill px-4 py-2 d-flex align-items-center gap-2">
+                            <span class="fw-bold">+</span> Create New File
+                        </a>
+                        <a href="{% url 'form_01c_manage' %}" class="btn btn-primary rounded-pill px-4 py-2 ms-2">
+                            View All File
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="mb-0 ">Formulir SPT 1111</h6>
+                    <p class="text-sm ">Formulir SPT Masa PPN 1111</p>
+                    <div class="pe-2">
+                        <div class="chart">
+                            <div class="chart p-0 m-0">
+                                <img src="{% static 'assets/option-image/spt4.png' %}" alt="Chart Image"
+                                     class="w-100" style="height: 180px; object-fit: cover; border: 1px solid black;">
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="dark horizontal">
+                    <div class="d-flex justify-content-center">
+                        <a href="{% url 'form-spt-1111' %}"
+                           class="btn btn-success rounded-pill px-4 py-2 d-flex align-items-center gap-2">
+                            <span class="fw-bold">+</span> Create New File
+                        </a>
+                        <a href="{% url 'form_spt_1111_manage' %}" class="btn btn-primary rounded-pill px-4 py-2 ms-2">
+                            View All File
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer py-4  ">
+    <div class="container-fluid">
+        <div class="row align-items-center justify-content-lg-between">
+            <div class="col-lg-6 mb-lg-0 mb-4">
+                <div class="copyright text-center text-sm text-muted text-lg-start">
+                    ©
+                    <script>
+                        document.write(new Date().getFullYear())
+                    </script>
+                    <a href="#" class="font-weight-bold" target="_blank">SPT Form App</a>
+                    Copyright
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+{% endblock %}
