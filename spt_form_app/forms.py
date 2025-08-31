@@ -356,7 +356,10 @@ class Form01a1770IHal1(forms.Form):
     net_income = forms.CharField(
         max_length=20,
         label='',
-        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+        widget=forms.TextInput(attrs={
+            'readonly': 'readonly',
+            'data-target': 'id_net_domestic_income'
+        })
     )  # formula
 
     personal_expenses = forms.CharField(max_length=20, label='')
@@ -434,13 +437,19 @@ class Form01a1770IHal2(forms.Form):
     total_net_income_c = forms.CharField(
         max_length=20,
         label='Jumlah Bagian C',
-        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+        widget=forms.TextInput(attrs={
+            'readonly': 'readonly',
+            'data-target': 'id_employment_net_income'
+        })
     )
 
     total_net_income_d = forms.CharField(
         max_length=20,
         label='Jumlah Bagian D',
-        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+        widget=forms.TextInput(attrs={
+            'readonly': 'readonly',
+            'data-target':  'id_other_net_domestic_income'
+        })
     )
 
     def __init__(self, *args, **kwargs):
@@ -508,16 +517,45 @@ class Form1770(forms.Form):
         ('2', 'Kuasa'),
     ]
 
-    net_domestic_income = forms.CharField(max_length=20, label='')  # formula
-    employment_net_income = forms.CharField(max_length=20, label='')
-    other_net_domestic_income = forms.CharField(max_length=20, label='')
-    foreign_net_income = forms.CharField(max_length=20, label='')
-    total_net_income = forms.CharField(max_length=20, label='')  # formula
+    net_domestic_income = forms.CharField(
+        max_length=20,
+        label='',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+
+    employment_net_income = forms.CharField(
+        max_length=20,
+        label='',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+
+    other_net_domestic_income = forms.CharField(
+        max_length=20,
+        label='',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+
+    foreign_net_income = forms.CharField(max_length=20,label='',)
+
+    total_net_income = forms.CharField(
+        max_length=20,
+        label='',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+
     zakat = forms.CharField(max_length=20, label='')
-    net_income_after_zakat = forms.CharField(max_length=20, label='')  # formula
+    net_income_after_zakat = forms.CharField(
+        max_length=20,
+        label='',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
 
     loss_compensation = forms.CharField(max_length=20, label='8. Kompensasi Kerugian')
-    net_income_after_compensation = forms.CharField(max_length=20, label='9. Jumlah Penghasilan Neto Setelah Kompensasi Kerugian (7-8)')  # formula
+    net_income_after_compensation = forms.CharField(
+        max_length=20,
+        label='9. Jumlah Penghasilan Neto Setelah Kompensasi Kerugian (7-8)',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
 
     ptkp_option = forms.ChoiceField(
         choices=PTKP_OPTION_CHOICES,
@@ -526,16 +564,28 @@ class Form1770(forms.Form):
     )
 
     ptkp_amount = forms.IntegerField(label='Jumlah PTKP')
-    non_taxable_income = forms.CharField(max_length=20, label='10. Penghasilan Tidak Kena Pajak')
-    taxable_income = forms.CharField(max_length=20, label='11. Penghasilan Kena Pajak (9-10)')  # formula
+    non_taxable_income = forms.CharField(max_length=20,label='10. Penghasilan Tidak Kena Pajak')
+
+    taxable_income = forms.CharField(
+        max_length=20,
+        label='11. Penghasilan Kena Pajak (9-10)',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
 
     tax_payable = forms.CharField(max_length=20, label='12. PPh Terutang (Tarif Pasal 17 UU PPh X Angka 11')
     tax_reduction = forms.CharField(max_length=20, label='13. Pengembalian/Pengurangan PPh Pasal 24 yang Telah Dikreditkan')
-    total_tax_payable = forms.CharField(max_length=20, label='14. Jumlah PPh Terutang (12 + 13)')  # formula
+    total_tax_payable = forms.CharField(
+        max_length=20,
+        label='14. Jumlah PPh Terutang (12 + 13)',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
 
     withheld_income_tax = forms.CharField(
-        max_length=20, label='15. PPh yang Dipotong/Dipungut Oleh Pihak Lain, '
-                             'PPh yang Dibayar/Dipotong di Luar Negeri dan PPh Ditanggung Pemerintah')
+        max_length=20,
+        label='15. PPh yang Dipotong/Dipungut Oleh Pihak Lain, '
+              'PPh yang Dibayar/Dipotong di Luar Negeri dan PPh Ditanggung Pemerintah',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
 
     pph_option = forms.ChoiceField(
         choices=PPH_OPTION_CHOICES,
@@ -543,10 +593,18 @@ class Form1770(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control'}))
 
 
-    pph_option_field = forms.CharField(max_length=20, label='16. Jumlah PPh')
+    pph_option_field = forms.CharField(
+        max_length=20,
+        label='16. Jumlah PPh',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
     self_assessed_income_tax_1 = forms.CharField(max_length=20, label='17a. PPh Pasal 25 Bulanan')
     self_assessed_income_tax_2 = forms.CharField(max_length=20, label='17b. STP PPh Pasal 25 (Hanya Pokok Pajak)')
-    total_tax_credit = forms.CharField(max_length=20, label='18. Jumlah Kredit Pajak (17a + 17b)')  # formula
+    total_tax_credit = forms.CharField(
+        max_length=20,
+        label='18. Jumlah Kredit Pajak (17a + 17b)',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )  # formula
 
     paid_option_income_tax = forms.ChoiceField(
         choices=PAID_OPTION_CHOICES,
@@ -554,7 +612,11 @@ class Form1770(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control'}))
 
     settlement_date = forms.DateField(label='Tanggal Pelunasan', widget=forms.DateInput(attrs={'type': 'date'}))
-    paid_option_income_tax_field = forms.CharField(max_length=20, label='19. Jumlah PPh yang Kurang/Lebih Bayar (16-18)')  # formula
+    paid_option_income_tax_field = forms.CharField(
+        max_length=20,
+        label='19. Jumlah PPh yang Kurang/Lebih Bayar (16-18)',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )  # formula
 
     application_option = forms.ChoiceField(
         choices=APPLICATION_OPTION_CHOICES,

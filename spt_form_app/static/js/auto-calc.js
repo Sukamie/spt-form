@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
         'id_total_net_rental_income',
         'id_total_net_prize',
         'id_total_net_capital_gains',
-        'total_net_other_income'
+        'id_total_net_other_income'
     ];
     const totalSideD_1770IHal2 = document.getElementById('id_total_net_income_d');
 
@@ -120,29 +120,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (totalSideB_otherGrossIncome) totalSideB_otherGrossIncome.value = total;
     }
 
-    /* ========================================================
-       6. KALKULASI TOTAL SIDE A (1770-I-HAL 1)
-    ======================================================== */
-
-    const sideA_total_fields = [
-        'id_net_income',
-        'id_total_positive_fiscal_adjustment',
-        'id_total_negative_fiscal_adjustment',
-    ];
-    const totalSideA = document.getElementById('id_total_side_a');
-
-    function calculateSideA_total() {
-        let total = 0;
-        sideA_total_fields.forEach(id => {
-            const el = document.getElementById(id);
-            total += parseFloat(el?.value.replace(/,/g, '')) || 0;
-        });
-        if (totalSideA) totalSideA.value = total;
-    }
-
 
     /* ========================================================
-       7. FUNGSI KALKULASI UMUM
+       6. FUNGSI KALKULASI UMUM
     ======================================================== */
 
     // Perhitungan dengan multiplier tetap
@@ -233,7 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       8. PERHITUNGAN DENGAN ROW (Event Delegation)
+       7. PERHITUNGAN DENGAN ROW (Event Delegation)
     ======================================================== */
     function setupGrossTurnoverDelegation(tableId, multiplier = 0.005) {
         const tbody = document.querySelector(`#${tableId} tbody`);
@@ -263,7 +243,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       9. KALKULASI TOTAL OTOMATIS 1770-I-Hal-1 Side 2
+       8. KALKULASI TOTAL OTOMATIS 1770-I-Hal-1 Side 2
     ======================================================== */
 
     const side2_1770IHal1_fields = [
@@ -291,7 +271,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* ========================================================
-       10. KALKULASI TOTAL OTOMATIS 1770-I-Hal-1 Side 3
+       9. KALKULASI TOTAL OTOMATIS 1770-I-Hal-1 Side 3
     ======================================================== */
 
     const side3_1770IHal1_fields = [
@@ -313,7 +293,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       11. PEMANGGILAN FUNGSI KALKULASI
+       10. PEMANGGILAN FUNGSI KALKULASI
     ======================================================== */
 
     // Fixed rate
@@ -350,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ========================================================
-       12. EVENT LISTENER UNTUK FIELD MANUAL
+       11. EVENT LISTENER UNTUK FIELD MANUAL
     ======================================================== */
     sideA1770III_fields.forEach(id => {
         document.getElementById(id)?.addEventListener('input', calculateSideA1770IIITotal);
@@ -373,14 +353,10 @@ document.addEventListener("DOMContentLoaded", function () {
     side3_1770IHal1_fields.forEach(id => {
         document.getElementById(id)?.addEventListener('input', calculateSide3_1770IHal1Total);
     });
-    sideA_total_fields.forEach(id => {
-        document.getElementById(id)?.addEventListener('input', calculateSideA_total);
-    });
 
     /* ========================================================
-       13. HITUNG NILAI AWAL
+       12. HITUNG NILAI AWAL
     ======================================================== */
-    calculateSideA_total();
     calculateSideB_1770IHal2Total();
     calculateSideD_1770IHal2Total();
     calculateSideBTotal();

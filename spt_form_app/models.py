@@ -29,34 +29,23 @@ class Form01aIdentity(models.Model):
 class Form01aSheet1770(models.Model):
     id_form01aIdentity = models.ForeignKey(Form01aIdentity, on_delete=models.CASCADE)
 
-    # net_domestic_income = formula
-    employment_net_income = models.CharField(max_length=20)
-    other_net_domestic_income = models.CharField(max_length=20)
     foreign_net_income = models.CharField(max_length=20)
-    # total_net_income = formula
     zakat = models.CharField(max_length=20)
-    # net_income_after_zakat = formula
 
     loss_compensation = models.CharField(max_length=20)
-    # net_income_after_compensation = formula
+    ptkp_option = models.CharField(max_length=20)
+    ptkp_amount = models.IntegerField()
     non_taxable_income = models.CharField(max_length=20)
-    non_taxable_income_option = models.CharField(max_length=20)
-    # taxable_income = formula
 
     tax_payable = models.CharField(max_length=20)
     tax_reduction = models.CharField(max_length=20)
-    # total_tax_payable = formula
 
-    withheld_income_tax = models.CharField(max_length=20)
-    tax_credit_option = models.CharField(max_length=20)
-    tax_credit_option_field  = models.CharField(max_length=20)
+    pph_option = models.CharField(max_length=20)
     self_assessed_income_tax_1 = models.CharField(max_length=20)
     self_assessed_income_tax_2 = models.CharField(max_length=20)
-    # total_tax_credit = formula
 
     paid_option_income_tax = models.CharField(max_length=20)
     settlement_date = models.DateField()
-    # paid_option_income_tax_field = formula
     application_option = models.CharField(max_length=20)
 
     income_tax_installment = models.CharField(max_length=20)
@@ -78,20 +67,18 @@ class Form01aSheet1770IHal1(models.Model):
     id_form01aIdentity = models.ForeignKey(Form01aIdentity, on_delete=models.CASCADE)
 
     book_keeping_option = models.CharField(max_length=20)
-    public_accountant = models.CharField(max_length=255)
-    public_accountant_npwp = models.CharField(max_length=20)
-    public_accountant_office = models.CharField(max_length=255)
-    public_accountant_office_npwp = models.CharField(max_length=20)
-    tax_consultant = models.CharField(max_length=255)
-    tax_consultant_npwp =  models.CharField(max_length=20)
-    tax_consultant_office = models.CharField(max_length=255)
-    tax_consultant_office_npwp = models.CharField(max_length=80)
+    public_accountant = models.CharField(max_length=255, null=True)
+    public_accountant_npwp = models.CharField(max_length=20, null=True)
+    public_accountant_office = models.CharField(max_length=255, null=True)
+    public_accountant_office_npwp = models.CharField(max_length=20, null=True)
+    tax_consultant = models.CharField(max_length=255, null=True)
+    tax_consultant_npwp =  models.CharField(max_length=20, null=True)
+    tax_consultant_office = models.CharField(max_length=255, null=True)
+    tax_consultant_office_npwp = models.CharField(max_length=20, null=True)
 
     business_turnover = models.CharField(max_length=20)
     cost_of_goods_sold = models.CharField(max_length=20)
-    # total_gross_revenue  = formula
     business_expenses = models.CharField(max_length=20)
-    # net_income = formula
 
     personal_expenses = models.CharField(max_length=20)
     insurance_premium = models.CharField(max_length=20)
@@ -104,14 +91,10 @@ class Form01aSheet1770IHal1(models.Model):
     positive_depreciation_difference = models.CharField(max_length=20)
     income_maintenance_expenses = models.CharField(max_length=20)
     positive_fiscal_adjustment = models.CharField(max_length=20)
-    # total_positive_fiscal_adjustment = formula
 
     business_turnover_income = models.CharField(max_length=20)
     negative_depreciation_difference = models.CharField(max_length=20)
     negative_fiscal_adjustment = models.CharField(max_length=20)
-    # total_negative_fiscal_adjustment = formula
-
-    # total_side_a = formula
 
     class Meta:
         verbose_name = _('Form01a_1770_I_Hal1')
@@ -154,7 +137,7 @@ class Form01aSheet1770IHal2(models.Model):
     def __str__(self):
         return self.id_form01aIdentity
 
-class Form01aSheet1770Ihal2C(models.Model):
+class Form01aSheet1770IHal2C(models.Model):
     id_form01aIdentity = models.ForeignKey(Form01aIdentity, on_delete=models.CASCADE)
 
     employer_npwp = models.CharField(max_length=255)
@@ -187,6 +170,7 @@ class Form01aSheet1770III(models.Model):
     id_form01aIdentity = models.ForeignKey(Form01aIdentity, on_delete=models.CASCADE)
 
     saving_tax_base = models.CharField(max_length=20)
+    obligation_option = models.CharField(max_length=20)
     interest_tax_base = models.CharField(max_length=20)
     share_sale_tax_base = models.CharField(max_length=20)
     prize_tax_base = models.CharField(max_length=20)
@@ -196,9 +180,11 @@ class Form01aSheet1770III(models.Model):
     received_buildings_tax_base = models.CharField(max_length=20)
     land_lease_tax_base = models.CharField(max_length=20)
     construction_service_tax_base = models.CharField(max_length=20)
+    distributor_option = models.CharField(max_length=20)
     distributor_tax_base = models.CharField(max_length=20)
     interest_on_deposits_pay_tax_base = models.CharField(max_length=20)
     derivative_income_tax_base = models.CharField(max_length=20)
+    dividend_option = models.CharField(max_length=20)
     dividend_tax_base = models.CharField(max_length=20)
     wife_income_tax_base = models.CharField(max_length=20)
     other_income_tax_base = models.CharField(max_length=20)
